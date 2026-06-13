@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { EnquiryWizard } from "@/components/enquiry/EnquiryWizard";
 import { generatePageMetadata } from "@/lib/seo";
 import { Shield } from "lucide-react";
@@ -8,11 +9,7 @@ export const metadata = generatePageMetadata(
   "/enquiry"
 );
 
-export default function EnquiryPage({
-  searchParams,
-}: {
-  searchParams: { product?: string };
-}) {
+export default function EnquiryPage() {
   return (
     <div className="min-h-screen bg-navy pt-24 pb-16">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -26,7 +23,9 @@ export default function EnquiryPage({
             <strong className="text-white">2 hours</strong> to schedule a visit.
           </p>
         </div>
-        <EnquiryWizard productInterest={searchParams.product} />
+        <Suspense fallback={null}>
+          <EnquiryWizard />
+        </Suspense>
       </div>
     </div>
   );

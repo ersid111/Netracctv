@@ -1,146 +1,112 @@
-import { prisma } from "@/lib/prisma";
+"use client";
+
+import { useState, useEffect } from "react";
 import { formatDate } from "@/lib/utils";
 import { priorityColors, statusColors } from "@/lib/lead-scoring";
-import Link from "next/link";
 import { Download, MessageSquare } from "lucide-react";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import toast from "react-hot-toast";
 
-const STATUSES = ["ALL", "NEW", "IN_REVIEW", "QUOTED", "WON", "LOST", "ARCHIVED"];
-
-async function getEnquiries(status: string, search: string) {
-  return prisma.enquiry.findMany({
-    where: {
-      ...(status && status !== "ALL" ? { status } : {}),
-      ...(search
-        ? {
-            OR: [
-              { name: { contains: search } },
-              { email: { contains: search } },
-              { phone: { contains: search } },
-              { company: { contains: search } },
-            ],
-          }
-        : {}),
-    },
-    orderBy: [{ leadScore: "desc" }, { createdAt: "desc" }],
-    include: { notes: { take: 1, orderBy: { createdAt: "desc" } } },
-  });
+interface Enquiry {
+  id: string;
+  name: string;
+  phone: string;
+  email: string;
+  propertyType: string;
+  status: string;
+  priority: string;
+  leadScore: number;
+  productInterest?: string;
+  createdAt: string;
 }
 
-export default async function EnquiriesPage({
-  searchParams,
-}: {
-  searchParams: { status?: string; search?: string };
-}) {
-  const status = searchParams.status || "ALL";
-  const search = searchParams.search || "";
-  const enquiries = await getEnquiries(status, search);
+export default function AdminEnquiriesPage() {
+  const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/admin/enquiries")
+      .then((r) => r.json())
+      .then((d) => setEnquiries(Array.isArray(d) ? d : []))
+      .catch(() => setEnquiries([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const updateStatus = async (id: string, status: string) => {
+    const res = await fetch(`/api/admin/enquiries/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    });
+    if (res.ok) {
+      setEnquiries((prev) => prev.map((e) => (e.id === id ? { ...e, status } : e)));
+      toast.success("Status updated");
+    }
+  };
 
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-black text-white">Enquiries</h1>
-          <p className="text-white/40 text-sm mt-1">{enquiries.length} enquiries</p>
+          <p className="text-white/40 text-sm mt-1">{loading ? "Loading…" : `${enquiries.length} enquiries`}</p>
         </div>
-        <a
-          href="/api/leads/export"
-          className="flex items-center gap-2 bg-brand-blue text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-brand-blue-dark transition-all"
-        >
-          <Download className="w-4 h-4" />
-          Export CSV
+        <a href="/api/leads/export" download>
+          <Button variant="ghost" size="sm">
+            <Download className="w-4 h-4" /> Export CSV
+          </Button>
         </a>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-2 mb-6">
-        {STATUSES.map((s) => (
-          <Link
-            key={s}
-            href={`/admin/enquiries?status=${s}${search ? `&search=${search}` : ""}`}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-              status === s
-                ? "bg-brand-blue text-white"
-                : "bg-white/5 border border-white/10 text-white/50 hover:text-white"
-            }`}
-          >
-            {s}
-          </Link>
-        ))}
-      </div>
-
-      {/* Search */}
-      <form className="mb-6">
-        <input
-          name="search"
-          defaultValue={search}
-          placeholder="Search by name, email, phone..."
-          className="w-full max-w-md bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-brand-blue"
-        />
-        {status !== "ALL" && <input type="hidden" name="status" value={status} />}
-      </form>
-
-      {/* Table */}
       <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-white/10">
-                {["Client", "Contact", "Property", "Product Interest", "Score", "Priority", "Status", "Date", "Action"].map((h) => (
-                  <th key={h} className="px-4 py-3 text-left text-xs text-white/30 font-medium uppercase tracking-wider whitespace-nowrap">
-                    {h}
-                  </th>
+                {["Name", "Contact", "Property", "Score", "Status", "Priority", "Date"].map((h) => (
+                  <th key={h} className="px-4 py-3 text-left text-xs text-white/30 uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {enquiries.map((e) => (
-                <tr key={e.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                <tr key={e.id} className="border-b border-white/5 hover:bg-white/5">
                   <td className="px-4 py-3">
-                    <p className="text-white font-medium text-sm">{e.name}</p>
-                    {e.company && <p className="text-white/30 text-xs">{e.company}</p>}
+                    <div className="text-white font-medium text-sm">{e.name}</div>
+                    {e.productInterest && <div className="text-white/30 text-xs">{e.productInterest}</div>}
+                  </td>
+                  <td className="px-4 py-3 text-white/60 text-sm">{e.phone}</td>
+                  <td className="px-4 py-3 text-white/60 text-sm">{e.propertyType}</td>
+                  <td className="px-4 py-3">
+                    <span className="font-bold text-white text-sm">{e.leadScore}</span>
                   </td>
                   <td className="px-4 py-3">
-                    <p className="text-white/70 text-sm">{e.phone}</p>
-                    <p className="text-white/30 text-xs">{e.email}</p>
-                  </td>
-                  <td className="px-4 py-3 text-white/60 text-sm capitalize">{e.propertyType}</td>
-                  <td className="px-4 py-3 text-white/60 text-xs max-w-[150px] truncate">{e.productInterest || "—"}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-1.5">
-                      <div className="w-12 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-brand-blue rounded-full" style={{ width: `${e.leadScore}%` }} />
-                      </div>
-                      <span className="text-white text-xs font-bold">{e.leadScore}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-white text-xs font-medium ${priorityColors[e.priority]}`}>
-                      {e.priority}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-white text-xs font-medium ${statusColors[e.status]}`}>
-                      {e.status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-white/40 text-xs whitespace-nowrap">{formatDate(e.createdAt)}</td>
-                  <td className="px-4 py-3">
-                    <a
-                      href={`https://wa.me/${e.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Hi ${e.name}, this is NETRA CCTV regarding your security enquiry.`)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-[#25D366] hover:text-emerald-400 transition-colors text-xs"
+                    <select
+                      value={e.status}
+                      onChange={(ev) => updateStatus(e.id, ev.target.value)}
+                      className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-xs text-white focus:outline-none"
                     >
-                      <MessageSquare className="w-3.5 h-3.5" />
-                      WhatsApp
-                    </a>
+                      {["NEW", "IN_REVIEW", "QUOTED", "WON", "LOST"].map((s) => (
+                        <option key={s} value={s} className="bg-navy">{s}</option>
+                      ))}
+                    </select>
                   </td>
+                  <td className="px-4 py-3">
+                    <Badge variant={e.priority === "URGENT" ? "red" : e.priority === "HIGH" ? "yellow" : "outline"} size="sm">
+                      {e.priority}
+                    </Badge>
+                  </td>
+                  <td className="px-4 py-3 text-white/40 text-xs">{formatDate(e.createdAt)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-          {enquiries.length === 0 && (
-            <div className="text-center py-16 text-white/30">No enquiries found.</div>
+          {!loading && enquiries.length === 0 && (
+            <div className="text-center py-16 text-white/30 flex flex-col items-center gap-3">
+              <MessageSquare className="w-8 h-8 text-white/10" />
+              <p>No enquiries yet. They appear here after form submissions.</p>
+            </div>
           )}
         </div>
       </div>

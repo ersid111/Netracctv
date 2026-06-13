@@ -1,18 +1,33 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
+import { STATIC_PORTFOLIOS } from "@/lib/static-data";
 import { parseJsonField } from "@/lib/utils";
 import Link from "next/link";
 import { ArrowLeft, MapPin, Camera, Clock } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
+export async function generateStaticParams() {
+  return STATIC_PORTFOLIOS.map((p) => ({ slug: p.slug }));
+}
+
 export default async function PortfolioDetailPage({ params }: { params: { slug: string } }) {
-  const item = await prisma.portfolio.findFirst({
-    where: { OR: [{ slug: params.slug }, { id: params.slug }], isPublished: true },
-  });
+  let item = null;
+  if (process.env.STATIC_EXPORT === "true") {
+    item = STATIC_PORTFOLIOS.find((p) => p.slug === params.slug) ?? null;
+  } else {
+    try {
+      const raw = await prisma.portfolio.findFirst({
+        where: { OR: [{ slug: params.slug }, { id: params.slug }], isPublished: true },
+      });
+      item = raw ?? STATIC_PORTFOLIOS.find((p) => p.slug === params.slug) ?? null;
+    } catch {
+      item = STATIC_PORTFOLIOS.find((p) => p.slug === params.slug) ?? null;
+    }
+  }
 
   if (!item) notFound();
 
-  const tags = parseJsonField<string[]>(item.tags, []);
+  const tags: string[] = Array.isArray(item.tags) ? item.tags as string[] : parseJsonField<string[]>(item.tags as string, []);
 
   return (
     <div className="bg-navy min-h-screen pt-24 pb-16">

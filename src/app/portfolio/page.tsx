@@ -3,6 +3,7 @@ import { parseJsonField } from "@/lib/utils";
 import { generatePageMetadata } from "@/lib/seo";
 import { ParticleGrid } from "@/components/widgets/ParticleGrid";
 import { PortfolioGrid } from "@/components/portfolio/PortfolioGrid";
+import { STATIC_PORTFOLIOS } from "@/lib/static-data";
 import type { Portfolio } from "@/types";
 
 export const metadata = generatePageMetadata(
@@ -12,16 +13,20 @@ export const metadata = generatePageMetadata(
 );
 
 async function getPortfolios() {
-  const items = await prisma.portfolio.findMany({
-    where: { isPublished: true },
-    orderBy: [{ isFeatured: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
-  });
-
-  return items.map((p) => ({
-    ...p,
-    galleryImages: parseJsonField<string[]>(p.galleryImages, []),
-    tags: parseJsonField<string[]>(p.tags, []),
-  })) as Portfolio[];
+  if (process.env.STATIC_EXPORT === "true") return STATIC_PORTFOLIOS;
+  try {
+    const items = await prisma.portfolio.findMany({
+      where: { isPublished: true },
+      orderBy: [{ isFeatured: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
+    });
+    return items.map((p) => ({
+      ...p,
+      galleryImages: parseJsonField<string[]>(p.galleryImages, []),
+      tags: parseJsonField<string[]>(p.tags, []),
+    })) as Portfolio[];
+  } catch {
+    return STATIC_PORTFOLIOS;
+  }
 }
 
 export default async function PortfolioPage() {

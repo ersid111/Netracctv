@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "framer-motion";
@@ -24,11 +25,9 @@ const STEPS = [
   { id: 6, title: "Your Details", component: StepContact },
 ];
 
-interface Props {
-  productInterest?: string;
-}
-
-export function EnquiryWizard({ productInterest }: Props) {
+export function EnquiryWizard() {
+  const searchParams = useSearchParams();
+  const productInterest = searchParams.get("product") || "";
   const [currentStep, setCurrentStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);

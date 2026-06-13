@@ -6,6 +6,7 @@ import Image from "next/image";
 import { ArrowLeft, Check, MessageCircle, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { STATIC_PRODUCTS } from "@/lib/static-data";
 
 const CATEGORY_LABELS: Record<string, string> = {
   IP_CAMERAS: "IP Camera",
@@ -18,15 +19,41 @@ const CATEGORY_LABELS: Record<string, string> = {
   INTERCOM: "Intercom",
 };
 
+export async function generateStaticParams() {
+  return STATIC_PRODUCTS.map((p) => ({ slug: p.slug }));
+}
+
 export default async function ProductDetailPage({ params }: { params: { slug: string } }) {
-  const product = await prisma.product.findFirst({
-    where: { OR: [{ slug: params.slug }, { id: params.slug }], isActive: true },
-  });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let product: any = null;
+
+  if (process.env.STATIC_EXPORT === "true") {
+    product = STATIC_PRODUCTS.find((p) => p.slug === params.slug) ?? null;
+  } else {
+    try {
+      const raw = await prisma.product.findFirst({
+        where: { OR: [{ slug: params.slug }, { id: params.slug }], isActive: true },
+      });
+      if (raw) {
+        product = {
+          ...raw,
+          features: parseJsonField<string[]>(raw.features, []),
+          specifications: parseJsonField<Record<string, string>>(raw.specifications, {}),
+          images: parseJsonField<string[]>(raw.images, []),
+        };
+      }
+    } catch {
+      product = STATIC_PRODUCTS.find((p) => p.slug === params.slug) ?? null;
+    }
+  }
 
   if (!product) notFound();
 
-  const features = parseJsonField<string[]>(product.features, []);
-  const specs = parseJsonField<Record<string, string>>(product.specifications, {});
+  const features: string[] = Array.isArray(product.features) ? product.features : [];
+  const specs: Record<string, string> =
+    product.specifications && typeof product.specifications === "object" && !Array.isArray(product.specifications)
+      ? product.specifications
+      : {};
   const categoryLabel = CATEGORY_LABELS[product.category] || product.category;
   const waUrl = getProductWhatsAppUrl(product.name, categoryLabel);
 
@@ -38,7 +65,6 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
         </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Image */}
           <div className="relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-brand-blue/10 to-navy border border-white/10">
             {product.imageUrl ? (
               <Image src={product.imageUrl} alt={product.name} fill className="object-cover" />
@@ -49,19 +75,15 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
             )}
           </div>
 
-          {/* Details */}
           <div>
             <div className="flex flex-wrap gap-2 mb-3">
               <Badge variant="blue" size="md">{categoryLabel}</Badge>
               {product.brand && <Badge variant="outline" size="md">{product.brand}</Badge>}
               {product.isFeatured && <Badge variant="yellow" size="md">Featured</Badge>}
             </div>
-
             <h1 className="text-3xl font-black text-white mb-3">{product.name}</h1>
             {product.model && <p className="text-white/40 text-sm mb-4">Model: {product.model}</p>}
             <p className="text-white/60 leading-relaxed mb-6">{product.description}</p>
-
-            {/* Price */}
             <div className="bg-white/5 border border-white/10 rounded-xl p-4 mb-6">
               {product.priceOnRequest ? (
                 <p className="text-white font-medium">Price available on request</p>
@@ -69,8 +91,6 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
                 <p className="text-3xl font-black text-white">{formatCurrency(product.price)}</p>
               ) : null}
             </div>
-
-            {/* Features */}
             {features.length > 0 && (
               <div className="mb-6">
                 <h3 className="text-white font-bold mb-3">Key Features</h3>
@@ -86,26 +106,21 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
                 </ul>
               </div>
             )}
-
-            {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-3">
               <a href={waUrl} target="_blank" rel="noopener noreferrer" className="flex-1">
                 <Button variant="whatsapp" size="lg" className="w-full">
-                  <MessageCircle className="w-5 h-5" />
-                  WhatsApp Enquiry
+                  <MessageCircle className="w-5 h-5" /> WhatsApp Enquiry
                 </Button>
               </a>
               <Link href={`/enquiry?product=${encodeURIComponent(product.name)}`} className="flex-1">
                 <Button size="lg" className="w-full">
-                  Get Detailed Quote
-                  <ArrowRight className="w-4 h-4" />
+                  Get Detailed Quote <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
             </div>
           </div>
         </div>
 
-        {/* Specs Table */}
         {Object.keys(specs).length > 0 && (
           <div className="mt-12">
             <h2 className="text-2xl font-bold text-white mb-6">Specifications</h2>
