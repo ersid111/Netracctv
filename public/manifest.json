@@ -1,0 +1,35 @@
+{
+  "name": "NETRA CCTV",
+  "short_name": "NETRA",
+  "description": "Premium AI-powered CCTV installation and security solutions.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#071A2E",
+  "theme_color": "#071A2E",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["business", "security"],
+  "shortcuts": [
+    {
+      "name": "Book Free Visit",
+      "url": "/enquiry",
+      "description": "Book a free site survey"
+    },
+    {
+      "name": "View Products",
+      "url": "/products",
+      "description": "Browse our product catalogue"
+    }
+  ]
+}
