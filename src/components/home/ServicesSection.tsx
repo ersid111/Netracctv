@@ -101,7 +101,7 @@ export function ServicesSection() {
                 </ul>
                 <Link
                   href={`/services#${service.id}`}
-                  className="inline-flex items-center gap-1 text-sm font-medium text-brand-blue hover:text-blue-300 transition-colors"
+                  className="inline-flex items-center gap-1 text-sm font-medium text-brand-blue hover:text-blue-300 transition-colors py-2"
                 >
                   Learn more <ArrowRight className="w-3.5 h-3.5" />
                 </Link>

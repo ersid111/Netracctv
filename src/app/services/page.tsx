@@ -15,7 +15,7 @@ const iconMap: Record<string, React.ElementType> = {
 
 export default function ServicesPage() {
   return (
-    <div className="bg-navy min-h-screen">
+    <div className="bg-navy min-h-screen overflow-x-hidden">
       {/* Hero */}
       <section className="relative pt-24 pb-20 bg-hero-gradient overflow-hidden">
         <ParticleGrid />

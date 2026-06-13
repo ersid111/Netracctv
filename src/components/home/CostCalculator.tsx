@@ -106,7 +106,7 @@ export function CostCalculator() {
                   <button
                     key={d}
                     onClick={() => setStorageDays(d)}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                    className={`px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
                       storageDays === d
                         ? "bg-brand-blue text-white"
                         : "bg-white/5 text-white/50 hover:bg-white/10"
