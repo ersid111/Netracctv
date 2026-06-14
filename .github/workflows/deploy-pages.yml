@@ -50,10 +50,10 @@ jobs:
           NEXTAUTH_URL: "https://ersid111.github.io/Netracctv"
           ADMIN_EMAIL: "admin@netracctv.com"
           ADMIN_PASSWORD: "Admin@Netra2024"
-          NEXT_PUBLIC_WHATSAPP_NUMBER: "919876543210"
+          NEXT_PUBLIC_WHATSAPP_NUMBER: "918329591217"
           NEXT_PUBLIC_COMPANY_NAME: "NETRA CCTV"
-          NEXT_PUBLIC_COMPANY_PHONE: "+91 98765 43210"
-          NEXT_PUBLIC_COMPANY_EMAIL: "info@netracctv.com"
+          NEXT_PUBLIC_COMPANY_PHONE: "+91 83295 91217"
+          NEXT_PUBLIC_COMPANY_EMAIL: "netraelectronics9@gmail.com"
           NEXT_PUBLIC_COMPANY_ADDRESS: "Mumbai, Maharashtra, India"
 
       - name: Setup Pages

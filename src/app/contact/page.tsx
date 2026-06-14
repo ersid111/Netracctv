@@ -42,7 +42,7 @@ export default function ContactPage() {
   };
 
   const waUrl = getWhatsAppUrl(
-    process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919876543210",
+    process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "918329591217",
     "Hi NETRA CCTV, I'd like to get in touch."
   );
 
@@ -65,14 +65,14 @@ export default function ContactPage() {
                 {
                   icon: Phone,
                   label: "Phone",
-                  value: process.env.NEXT_PUBLIC_COMPANY_PHONE || "+91 98765 43210",
-                  href: `tel:+919876543210`,
+                  value: process.env.NEXT_PUBLIC_COMPANY_PHONE || "+91 83295 91217",
+                  href: `tel:+918329591217`,
                 },
                 {
                   icon: Mail,
                   label: "Email",
-                  value: process.env.NEXT_PUBLIC_COMPANY_EMAIL || "info@netracctv.com",
-                  href: `mailto:info@netracctv.com`,
+                  value: process.env.NEXT_PUBLIC_COMPANY_EMAIL || "netraelectronics9@gmail.com",
+                  href: `mailto:netraelectronics9@gmail.com`,
                 },
                 {
                   icon: MapPin,

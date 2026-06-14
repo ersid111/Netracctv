@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Shield, Phone, Mail, MapPin, Clock, MessageCircle } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, MessageCircle } from "lucide-react";
+import { NetraLogo } from "@/components/ui/NetraLogo";
 
 const footerLinks = {
   Services: [
@@ -37,34 +38,29 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <Link href="/" className="flex items-center gap-2.5 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-brand-blue flex items-center justify-center">
-                <Shield className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <div className="text-white font-bold text-xl leading-none">NETRA</div>
-                <div className="text-brand-blue text-xs font-semibold tracking-widest">CCTV</div>
-              </div>
+            <Link href="/" className="inline-block mb-4">
+              <NetraLogo size="md" />
             </Link>
-            <p className="text-white/60 text-sm leading-relaxed mb-6 max-w-sm">
+            <p className="text-white/60 text-sm leading-relaxed mb-2 max-w-sm">
               Premium AI-powered CCTV installation and security solutions. Protecting homes,
               businesses, and industries with cutting-edge surveillance technology since 2014.
             </p>
+            <p className="text-white/40 text-xs mb-6">Proprietor: Ashok Shedale</p>
 
             <div className="space-y-3">
               <a
-                href="tel:+919876543210"
+                href={`tel:${process.env.NEXT_PUBLIC_COMPANY_PHONE?.replace(/\s/g, "") || "+918329591217"}`}
                 className="flex items-center gap-3 text-white/60 hover:text-white transition-colors text-sm group"
               >
                 <Phone className="w-4 h-4 text-brand-blue group-hover:text-brand-blue" />
-                {process.env.NEXT_PUBLIC_COMPANY_PHONE || "+91 98765 43210"}
+                {process.env.NEXT_PUBLIC_COMPANY_PHONE || "+91 83295 91217"}
               </a>
               <a
-                href={`mailto:${process.env.NEXT_PUBLIC_COMPANY_EMAIL || "info@netracctv.com"}`}
+                href={`mailto:${process.env.NEXT_PUBLIC_COMPANY_EMAIL || "netraelectronics9@gmail.com"}`}
                 className="flex items-center gap-3 text-white/60 hover:text-white transition-colors text-sm group"
               >
                 <Mail className="w-4 h-4 text-brand-blue" />
-                {process.env.NEXT_PUBLIC_COMPANY_EMAIL || "info@netracctv.com"}
+                {process.env.NEXT_PUBLIC_COMPANY_EMAIL || "netraelectronics9@gmail.com"}
               </a>
               <div className="flex items-start gap-3 text-white/60 text-sm">
                 <MapPin className="w-4 h-4 text-brand-blue mt-0.5 shrink-0" />

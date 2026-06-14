@@ -272,9 +272,9 @@ export const CHATBOT_RESPONSES: Record<string, string> = {
     "We supply and install IP cameras, HD analog cameras, PTZ cameras, thermal cameras, and more. What type of property are you securing?",
   installation: "Our installation service is end-to-end — we design, supply, install, and configure your complete system. Book a free site visit to get started.",
   contact:
-    "You can reach us at:\n📞 +91 98765 43210\n📧 info@netracctv.com\n💬 WhatsApp the same number\n\nOr use the Enquiry form for a detailed consultation.",
-  support: "We offer 24/7 customer support with 4-hour on-site response time under AMC contracts. Call us anytime at +91 98765 43210.",
+    "You can reach us at:\n📞 +91 83295 91217\n📧 netraelectronics9@gmail.com\n💬 WhatsApp the same number\n\nOr use the Enquiry form for a detailed consultation.",
+  support: "We offer 24/7 customer support with 4-hour on-site response time under AMC contracts. Call us anytime at +91 83295 91217.",
   amc: "Our AMC (Annual Maintenance Contract) ensures your system stays at peak performance with quarterly servicing, 4-hour response time, and free parts replacement within warranty.",
   default:
-    "Thank you for your question! For a detailed answer, please fill out our enquiry form or call us at +91 98765 43210. Our experts are available 24/7.",
+    "Thank you for your question! For a detailed answer, please fill out our enquiry form or call us at +91 83295 91217. Our experts are available 24/7.",
 };
